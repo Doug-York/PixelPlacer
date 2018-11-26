@@ -1,1 +1,6 @@
-
+Pixel:
+  -current color/past colors  
+  -time updated 
+  -location on canvas
+  -times changed
+  -nickname of who it was changed by
