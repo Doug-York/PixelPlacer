@@ -44,9 +44,7 @@ h1{
 #myCanvas{
     background-color: white;
     position: relative;
-    width: 500px;
     top: 100px;
-    height: 500px;
     float:left;
     margin: 20px;
 }
