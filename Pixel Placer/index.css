@@ -1,0 +1,48 @@
+body{
+    background-color: black;
+}
+h1{
+    color: white;
+    text-align: center;
+    font-family: monospace;
+}
+#pixelcolor{
+    color: white;
+    font-family: monospace;
+}
+.leftside{
+    position: relative;
+    top: 150px;
+    height: 500px;
+    width: 25%;
+    text-align: center;
+    float: left;
+}
+#colorselector{
+    cursor: pointer;
+}
+#submitbtn{
+    position: relative;
+    top: 75px;
+    font-family: monospace;
+}
+#nickname{
+    position: relative;
+    top:20px;
+    color: white;
+    font-family: monospace;
+}
+#nicknameinput{
+    position: relative;
+    top: 30px;
+    text-align: center;
+    font-family: monospace;
+}
+#myCanvas{
+    background-color: white;
+    position: relative;
+    width: 550px;
+    top: 100px;
+    height: 500px;
+    float:left;
+}
