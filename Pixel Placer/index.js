@@ -69,7 +69,6 @@ function fillPixels(mousePos) {
     var currentColor = color.value;
     let x = mousePos.x - (mousePos.x % 10) + .5;
     let y = mousePos.y - (mousePos.y % 10) + .5;
-    ctx.stroke();
     ctx.fillStyle = currentColor;
     ctx.fillRect(x, y, 9.5, 9.5);
     
