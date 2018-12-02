@@ -1,5 +1,59 @@
 "use strict";
 var nickname;
+var table;
+function sendRequest(newX, newY, currentColor){
+    console.log("Processing Request with x: "+newX+" y: "+newY+" current color: "+currentColor+" nickname: "+nickname.val());
+    
+    //TODO send request to server
+    
+    
+    document.getElementById("submitbtn").disabled = true;
+}
+
+function getPixelStats(x, y, currentColor){
+    var table = document.getElementById("statstable");
+    var count = document.getElementById("statstable").rows.length;
+    console.log("Num rows: "+count);
+    if(count>1){
+        table.deleteRow(1);
+    }
+    var row = table.insertRow(-1);
+    
+    var newX = (x-0.5)/10;
+    var newY = (y-0.5)/10;
+    //Add cells for each element
+    
+    //Cell 1 = Pixel Location
+    var cell1 = row.insertCell(-1);
+    cell1.innerHTML = newX + "," + newY;
+    
+    //Cell 2 = Current Color
+    var cell2 = row.insertCell(-1);
+    cell2.innerHTML = currentColor;
+    
+    //Cell 3 = previous color
+    //TODO Get request from server for previous color
+    
+    //Cell 4 = Time last Modified
+    //TODO Get time last modified by server
+    
+    //Cell 5 = Last Modified By
+    //TODO get name of who it was last modified by from the server
+    
+    
+    
+    
+    //Enable submit button
+    document.getElementById("submitbtn").disabled = false;
+    
+    var btn = document.getElementById("submitbtn");
+    btn.addEventListener('click',function(evt){
+        console.log("Button clicked!");
+        sendRequest(newX, newY, currentColor);
+    }, false);
+    
+}
+
 function getMousePos(canvas, evt){
   var rect = canvas.getBoundingClientRect();
         return {
@@ -7,6 +61,7 @@ function getMousePos(canvas, evt){
           y: evt.clientY - rect.top
         };
 }
+
 function fillPixels(mousePos) {
     var c = document.getElementById("myCanvas");
     var ctx = c.getContext("2d");
@@ -17,6 +72,8 @@ function fillPixels(mousePos) {
     ctx.stroke();
     ctx.fillStyle = currentColor;
     ctx.fillRect(x, y, 9.5, 9.5);
+    
+    getPixelStats(x, y, currentColor);
     
 }
 
@@ -57,6 +114,7 @@ function init() {
     drawCanvas();
     
 }
+
 $(document).ready( () => {
     nickname = $("#nicknameinput");
 });
