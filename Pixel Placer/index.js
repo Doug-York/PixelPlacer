@@ -1,4 +1,5 @@
 "use strict";
+var nickname;
 function getMousePos(canvas, evt){
   var rect = canvas.getBoundingClientRect();
         return {
@@ -23,11 +24,18 @@ function drawCanvas() {
     var c = document.getElementById("myCanvas");
     var ctx = c.getContext("2d");
     c.addEventListener('click', function(evt){
-        var mousePos = getMousePos(c, evt);
-        fillPixels(mousePos);
-        var message = 'Mouse position: ' + mousePos.x + ',' + mousePos.y;
-        console.log(message);
-      }, false);
+        console.log(nickname.val());
+        if(nickname.val().length==0){
+            alert("Please enter a nickname before you select a pixel");
+        }
+        else{
+            var mousePos = getMousePos(c, evt);
+            fillPixels(mousePos);
+            var message = 'Mouse position: ' + mousePos.x + ',' + mousePos.y;
+            console.log(message);
+        }
+        
+    }, false);
 
     var bw=500;
     var bh=500;
@@ -49,3 +57,6 @@ function init() {
     drawCanvas();
     
 }
+$(document).ready( () => {
+    nickname = $("#nicknameinput");
+});
