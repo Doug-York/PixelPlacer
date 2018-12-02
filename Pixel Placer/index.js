@@ -21,7 +21,9 @@ function fillPixels(mousePos) {
     
     var c = document.getElementById("myCanvas");
     var ctx = c.getContext("2d");
-    ctx.rect(mousePos.x, mousePos.y, 9.5, 9.5);
+    let x = mousePos.x - (mousePos.x % 10);
+    let y = mousePos.y - (mousePos.y % 10);
+    ctx.rect(x, y, 9.5, 9.5);
     ctx.stroke();
     ctx.fillStyle = "red";
     ctx.fill();
