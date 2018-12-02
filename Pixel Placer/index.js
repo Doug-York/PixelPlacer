@@ -7,26 +7,15 @@ function getMousePos(canvas, evt){
         };
 }
 function fillPixels(mousePos) {
-    /*var c = document.getElementById("myCanvas");
-    var ctx = c.getContext("2d");
-    ctx.rect(1,1,9.5,9.5);
-    ctx.stroke();
-    ctx.fillStyle = "red";
-    ctx.fill();
-    
-    ctx.rect(11,1,9.5,9.5);
-    ctx.stroke();
-    ctx.fillStyle = "blue";
-    ctx.fill();*/
-    
     var c = document.getElementById("myCanvas");
     var ctx = c.getContext("2d");
+    var color = document.getElementById("colorselector");
+    var currentColor = color.value;
     let x = mousePos.x - (mousePos.x % 10) + .5;
     let y = mousePos.y - (mousePos.y % 10) + .5;
-    ctx.rect(x, y, 9.5, 9.5);
     ctx.stroke();
-    ctx.fillStyle = "red";
-    ctx.fill();
+    ctx.fillStyle = currentColor;
+    ctx.fillRect(x, y, 9.5, 9.5);
     
 }
 
