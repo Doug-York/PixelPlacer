@@ -2,11 +2,12 @@
 
 Site domain: https://pixlplacer.firebaseapp.com/
 
+**Pixel Placer is an r/place type website that allows for multiple users to contribute to a single canvas**
+
 Contributors:
 
-[mailto](mailto:dwyork@purdue.edu)
-[mailto](mailto:jshepler@purdue.edu)
-[mailto](mailto:amcrick@purdue.edu) 
+[Doug York](mailto:dwyork@purdue.edu)
 
+[Josh Shepler](mailto:jshepler@purdue.edu)
 
-**Pixel Placer is an r/place type website that allows for multiple users to contribute to a single canvas**
+[Alex Crick](mailto:amcrick@purdue.edu) 
