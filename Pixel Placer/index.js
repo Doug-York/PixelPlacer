@@ -8,6 +8,16 @@ var newX;
 var newY;
 var currentColor;
 var oldColor;
+// cell3 helper function
+function componentToHex(c) {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
+// cell3 helper function
+function rgbToHex(r, g, b) {
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
 function revertPixel() {
     // use oldColor variable to set old rectangle back to what it was
     var c = document.getElementById("myCanvas");
@@ -68,6 +78,9 @@ function getPixelStats(x, y, currentColor){
     
     //Cell 3 = previous color
     //TODO Get request from server for previous color
+    var cell3 = row.insertCell(-1);
+    let hex = rgbToHex(oldColor.data[0], oldColor.data[1], oldColor.data[2]);
+    cell3.innerHTML = hex;
     
     //Cell 4 = Time last Modified
     //TODO Get time last modified by server
