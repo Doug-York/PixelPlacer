@@ -8,6 +8,6 @@ Contributors:
 
 [Doug York](mailto:dwyork@purdue.edu)
 
-[Josh Shepler](mailto:jshepler@purdue.edu)
+[Josh Shepler](mailto:jdsheple@purdue.edu)
 
 [Alex Crick](mailto:amcrick@purdue.edu) 
