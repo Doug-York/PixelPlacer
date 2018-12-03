@@ -4,7 +4,6 @@ var table;
 var oldX;
 var oldY;
 var lastTimeModified;
-
 function revertPixel() {
     // revert this pixel back to its original color //for now set back to white//
     // get current color from database to get color before new one selected
@@ -18,13 +17,30 @@ function revertPixel() {
 
 function checkCooldown() {
     //TODO take lastTimeModified, subtract from currentTime, if < 10 sec, send popup saying how much time left until can submit again
+    
+    // let through if first time
+    if (lastTimeModified == null) {
+        var d = new Date();
+        lastTimeModified = d.getTime();
+        return true;
+    }
+    var d = new Date();
+    let currentTime = d.getTime();
+    if (currentTime - lastTimeModified > 10000) {
+        // let submit
+        var d = new Date();
+        lastTimeModified = d.getTime();
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 function sendRequest(newX, newY, currentColor){
     console.log("Processing Request with x: "+newX+" y: "+newY+" current color: "+currentColor+" nickname: "+nickname.val());
     
     //TODO send request to server
-    
     
     document.getElementById("submitbtn").disabled = true;
 }
@@ -67,7 +83,6 @@ function getPixelStats(x, y, currentColor){
     if (document.getElementById("submitbtn").disabled == false) {
         if (oldX != null) {
             revertPixel();
-            console.log("got here");
             oldX = x;
             oldY = y;
         }
@@ -81,7 +96,18 @@ function getPixelStats(x, y, currentColor){
     var btn = document.getElementById("submitbtn");
     btn.addEventListener('click',function(evt){
         console.log("Button clicked!");
-        sendRequest(newX, newY, currentColor);
+        let bool = checkCooldown();
+        if (bool == false) {
+            // send popup
+            var d = new Date();
+            let timeLeft = (lastTimeModified - d.getTime()) / 1000;
+            var alertMsg = "Oops! You can't submit a new pixel for another " + timeLeft + " seconds!";
+            alert(alertMsg);
+        }
+        else {
+            sendRequest(newX, newY, currentColor);
+        }
+        
     }, false);
     
 }
