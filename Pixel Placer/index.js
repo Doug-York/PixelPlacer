@@ -9,19 +9,15 @@ var newY;
 var currentColor;
 var oldColor;
 function revertPixel() {
-    // revert this pixel back to its original color //for now set back to white//
-    // use oldColor variable to set rgba color value and then set prev pixel to oldColor.
+    // use oldColor variable to set old rectangle back to what it was
     var c = document.getElementById("myCanvas");
     var ctx = c.getContext("2d");
-    var currentColor = "#ffffff";
-    ctx.fillStyle = currentColor;
-    ctx.fillRect(oldX, oldY, 9, 9);
+    ctx.putImageData(oldColor, oldX, oldY);
+    
     // dont get pixel stats
 }
 
 function checkCooldown() {
-    //TODO take lastTimeModified, subtract from currentTime, if < 10 sec, send popup saying how much time left until can submit again
-    
     // let through if first time
     if (lastTimeModified == null) {
         var d = new Date();
@@ -83,23 +79,9 @@ function getPixelStats(x, y, currentColor){
     
     
     //Enable submit button
-    //Check if button already enabled, if so, do resetPixel, then continue
-    if (document.getElementById("submitbtn").disabled == false) {
-        if (oldX != null) {
-            revertPixel();
-            oldX = x;
-            oldY = y;
-        }
-    }
-    else {
-        document.getElementById("submitbtn").disabled = false;
-        oldX = x;
-        oldY = y;
-        // oldColor = canvas.getImageData(x, y, width, height)
-        // use this to store last clicked pixels color, so no calls to database have to be made to revert pixel
-    }
-    
-    
+    document.getElementById("submitbtn").disabled = false;
+    oldX = x;
+    oldY = y;
 }
 
 function getMousePos(canvas, evt){
@@ -116,6 +98,13 @@ function fillPixels(mousePos) {
     var c = document.getElementById("myCanvas");
     var ctx = c.getContext("2d");
     var color = document.getElementById("colorselector");
+    if (document.getElementById("submitbtn").disabled == true) {
+        oldColor = ctx.getImageData(mousePos.x, mousePos.y, 9, 9);
+    }
+    else {
+        revertPixel();
+        oldColor = ctx.getImageData(mousePos.x, mousePos.y, 9, 9);
+    }
     currentColor = color.value;
     ctx.fillStyle = currentColor;
     ctx.fillRect(mousePos.x, mousePos.y, 9, 9);
