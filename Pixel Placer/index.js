@@ -4,6 +4,9 @@ var table;
 var oldX;
 var oldY;
 var lastTimeModified;
+var newX;
+var newY;
+var currentColor;
 
 function revertPixel() {
     // revert this pixel back to its original color //for now set back to white//
@@ -38,8 +41,8 @@ function getPixelStats(x, y, currentColor){
     }
     var row = table.insertRow(-1);
     
-    var newX = (x - 1)/10;
-    var newY = (y - 1)/10;
+    newX = (x - 1)/10;
+    newY = (y - 1)/10;
     //Add cells for each element
     
     //Cell 1 = Pixel Location
@@ -78,11 +81,7 @@ function getPixelStats(x, y, currentColor){
         oldY = y;
     }
     
-    var btn = document.getElementById("submitbtn");
-    btn.addEventListener('click',function(evt){
-        console.log("Button clicked!");
-        sendRequest(newX, newY, currentColor);
-    }, false);
+    
     
 }
 
@@ -100,7 +99,7 @@ function fillPixels(mousePos) {
     var c = document.getElementById("myCanvas");
     var ctx = c.getContext("2d");
     var color = document.getElementById("colorselector");
-    var currentColor = color.value;
+    currentColor = color.value;
     ctx.fillStyle = currentColor;
     ctx.fillRect(mousePos.x, mousePos.y, 9, 9);
     getPixelStats(mousePos.x, mousePos.y, currentColor);
@@ -147,4 +146,9 @@ function init() {
 
 $(document).ready( () => {
     nickname = $("#nicknameinput");
+    var btn = document.getElementById("submitbtn");
+    btn.addEventListener('click',function(evt){
+        console.log("Button clicked!");
+        sendRequest(newX, newY, currentColor);
+    }, false);
 });
