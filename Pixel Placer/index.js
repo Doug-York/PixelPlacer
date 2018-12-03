@@ -167,7 +167,7 @@ $(document).ready( () => {
         if (bool == false) {
             // send popup
             var d = new Date();
-            let timeLeft = (lastTimeModified - d.getTime()) / 1000;
+            let timeLeft = Math.round(10 - (d.getTime() - lastTimeModified) / 1000);
             var alertMsg = "Oops! You can't submit a new pixel for another " + timeLeft + " seconds!";
             alert(alertMsg);
         }
