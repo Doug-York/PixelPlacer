@@ -14,9 +14,16 @@ function revertPixel() {
     var c = document.getElementById("myCanvas");
     var ctx = c.getContext("2d");
     var whiteColor = "#ffffff";
-    ctx.fillStyle = whiteColor;
-    ctx.fillRect(oldX, oldY, 9, 9);
-    // dont get pixel stats
+    if(oldX==newX && oldY==newY){
+        //clicked on the same pixel, dont want to change it
+        //do nothing
+    }
+    else{
+        ctx.fillStyle = whiteColor;
+        ctx.fillRect(oldX, oldY, 9, 9);
+        // dont get pixel stats
+    }
+    
 }
 
 function checkCooldown() {
@@ -117,9 +124,10 @@ function fillPixels(mousePos) {
     var ctx = c.getContext("2d");
     var color = document.getElementById("colorselector");
     currentColor = color.value;
+    getPixelStats(mousePos.x, mousePos.y, currentColor);
     ctx.fillStyle = currentColor;
     ctx.fillRect(mousePos.x, mousePos.y, 9, 9);
-    getPixelStats(mousePos.x, mousePos.y, currentColor);
+    
     
 }
 
