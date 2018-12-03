@@ -1,6 +1,25 @@
 "use strict";
 var nickname;
 var table;
+var oldX;
+var oldY;
+var lastTimeModified;
+
+function revertPixel() {
+    // revert this pixel back to its original color //for now set back to white//
+    // get current color from database to get color before new one selected
+    var c = document.getElementById("myCanvas");
+    var ctx = c.getContext("2d");
+    var currentColor = "#ffffff";
+    ctx.fillStyle = currentColor;
+    ctx.fillRect(oldX, oldY, 9, 9);
+    // dont get pixel stats
+}
+
+function checkCooldown() {
+    //TODO take lastTimeModified, subtract from currentTime, if < 10 sec, send popup saying how much time left until can submit again
+}
+
 function sendRequest(newX, newY, currentColor){
     console.log("Processing Request with x: "+newX+" y: "+newY+" current color: "+currentColor+" nickname: "+nickname.val());
     
@@ -44,7 +63,20 @@ function getPixelStats(x, y, currentColor){
     
     
     //Enable submit button
-    document.getElementById("submitbtn").disabled = false;
+    //Check if button already enabled, if so, do resetPixel, then continue
+    if (document.getElementById("submitbtn").disabled == false) {
+        if (oldX != null) {
+            revertPixel();
+            console.log("got here");
+            oldX = x;
+            oldY = y;
+        }
+    }
+    else {
+        document.getElementById("submitbtn").disabled = false;
+        oldX = x;
+        oldY = y;
+    }
     
     var btn = document.getElementById("submitbtn");
     btn.addEventListener('click',function(evt){
@@ -59,8 +91,8 @@ function getMousePos(canvas, evt){
         let posX = evt.clientX - rect.left;
         let posY = evt.clientY - rect.top;
         return {
-          x: posX - (posX % 10) + .5,
-          y: posY - (posY % 10) + .5
+          x: posX - (posX % 10) + 1,
+          y: posY - (posY % 10) + 1
         };
 }
 
@@ -70,7 +102,7 @@ function fillPixels(mousePos) {
     var color = document.getElementById("colorselector");
     var currentColor = color.value;
     ctx.fillStyle = currentColor;
-    ctx.fillRect(mousePos.x, mousePos.y, 9.5, 9.5);
+    ctx.fillRect(mousePos.x, mousePos.y, 9, 9);
     getPixelStats(mousePos.x, mousePos.y, currentColor);
     
 }
