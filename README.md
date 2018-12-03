@@ -11,3 +11,5 @@ Contributors:
 [Josh Shepler](mailto:jdsheple@purdue.edu)
 
 [Alex Crick](mailto:amcrick@purdue.edu) 
+
+*Group Project for CS252*
