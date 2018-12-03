@@ -13,8 +13,8 @@ function revertPixel() {
     // use oldColor variable to set rgba color value and then set prev pixel to oldColor.
     var c = document.getElementById("myCanvas");
     var ctx = c.getContext("2d");
-    var currentColor = "#ffffff";
-    ctx.fillStyle = currentColor;
+    var whiteColor = "#ffffff";
+    ctx.fillStyle = whiteColor;
     ctx.fillRect(oldX, oldY, 9, 9);
     // dont get pixel stats
 }
