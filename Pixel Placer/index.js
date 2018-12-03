@@ -7,9 +7,10 @@ var lastTimeModified;
 var newX;
 var newY;
 var currentColor;
+var oldColor;
 function revertPixel() {
     // revert this pixel back to its original color //for now set back to white//
-    // get current color from database to get color before new one selected
+    // use oldColor variable to set rgba color value and then set prev pixel to oldColor.
     var c = document.getElementById("myCanvas");
     var ctx = c.getContext("2d");
     var currentColor = "#ffffff";
@@ -94,6 +95,8 @@ function getPixelStats(x, y, currentColor){
         document.getElementById("submitbtn").disabled = false;
         oldX = x;
         oldY = y;
+        // oldColor = canvas.getImageData(x, y, width, height)
+        // use this to store last clicked pixels color, so no calls to database have to be made to revert pixel
     }
     
     
