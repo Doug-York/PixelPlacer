@@ -96,22 +96,6 @@ function getPixelStats(x, y, currentColor){
         oldY = y;
     }
     
-    var btn = document.getElementById("submitbtn");
-    btn.addEventListener('click',function(evt){
-        console.log("Button clicked!");
-        let bool = checkCooldown();
-        if (bool == false) {
-            // send popup
-            var d = new Date();
-            let timeLeft = (lastTimeModified - d.getTime()) / 1000;
-            var alertMsg = "Oops! You can't submit a new pixel for another " + timeLeft + " seconds!";
-            alert(alertMsg);
-        }
-        else {
-            sendRequest(newX, newY, currentColor);
-        }
-        
-    }, false);
     
 }
 
@@ -179,6 +163,17 @@ $(document).ready( () => {
     var btn = document.getElementById("submitbtn");
     btn.addEventListener('click',function(evt){
         console.log("Button clicked!");
-        sendRequest(newX, newY, currentColor);
+        let bool = checkCooldown();
+        if (bool == false) {
+            // send popup
+            var d = new Date();
+            let timeLeft = (lastTimeModified - d.getTime()) / 1000;
+            var alertMsg = "Oops! You can't submit a new pixel for another " + timeLeft + " seconds!";
+            alert(alertMsg);
+        }
+        else {
+            sendRequest(newX, newY, currentColor);
+        }
+        
     }, false);
 });
