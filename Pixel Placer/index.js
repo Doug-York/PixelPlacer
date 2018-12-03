@@ -56,9 +56,11 @@ function getPixelStats(x, y, currentColor){
 
 function getMousePos(canvas, evt){
   var rect = canvas.getBoundingClientRect();
+        let posX = evt.clientX - rect.left;
+        let posY = evt.clientY - rect.top;
         return {
-          x: evt.clientX - rect.left,
-          y: evt.clientY - rect.top
+          x: posX - (posX % 10) + .5,
+          y: posY - (posY % 10) + .5
         };
 }
 
@@ -67,12 +69,9 @@ function fillPixels(mousePos) {
     var ctx = c.getContext("2d");
     var color = document.getElementById("colorselector");
     var currentColor = color.value;
-    let x = mousePos.x - (mousePos.x % 10) + .5;
-    let y = mousePos.y - (mousePos.y % 10) + .5;
     ctx.fillStyle = currentColor;
-    ctx.fillRect(x, y, 9.5, 9.5);
-    
-    getPixelStats(x, y, currentColor);
+    ctx.fillRect(mousePos.x, mousePos.y, 9.5, 9.5);
+    getPixelStats(mousePos.x, mousePos.y, currentColor);
     
 }
 
