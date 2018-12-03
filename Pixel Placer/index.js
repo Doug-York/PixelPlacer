@@ -38,8 +38,8 @@ function getPixelStats(x, y, currentColor){
     }
     var row = table.insertRow(-1);
     
-    var newX = (x-0.5)/10;
-    var newY = (y-0.5)/10;
+    var newX = (x - 1)/10;
+    var newY = (y - 1)/10;
     //Add cells for each element
     
     //Cell 1 = Pixel Location
