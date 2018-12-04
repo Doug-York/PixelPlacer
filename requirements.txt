@@ -4,3 +4,6 @@ Pixel:
   -location on canvas
   -times changed
   -nickname of who it was changed by
+
+NodeJS:
+  - ExpressJS and Socket.io must be installed on server
