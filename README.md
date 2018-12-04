@@ -1,6 +1,6 @@
 # Pixel Placer
 
-Site domain: https://pixlplacer.firebaseapp.com/
+Site domain: http://pixlplacer.azurewebsites.net/
 
 **Pixel Placer is an r/place type website that allows for multiple users to contribute to a single canvas**
 
