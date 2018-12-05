@@ -9,6 +9,7 @@ var newY;
 var currentColor;
 var oldColor;
 var socket;
+var row;
 // cell3 helper function
 
 function componentToHex(c) {
@@ -53,7 +54,8 @@ function sendRequest(newX, newY, currentColor){
     console.log("Processing Request with x: "+newX+" y: "+newY+" current color: "+currentColor+" nickname: "+nickname.val());
     
     //TODO send request to server
-    var msgdata = {color :currentColor, x : oldX, y : oldY, nick : nickname.val()};
+    var d = new Date();
+    var msgdata = {color :currentColor, x : newX, y : newY, nick : nickname.val(), time : d.toLocaleString()};
     socket.emit('update pixel',msgdata);
     //
     document.getElementById("submitbtn").disabled = true;
@@ -66,10 +68,11 @@ function getPixelStats(x, y, currentColor){
     if(count>1){
         table.deleteRow(1);
     }
-    var row = table.insertRow(-1);
+    row = table.insertRow(-1);
     
     newX = (x - 1)/10;
     newY = (y - 1)/10;
+    socket.emit('check stats', {x : newX, y : newY});
     //Add cells for each element
     
     //Cell 1 = Pixel Location
@@ -129,10 +132,14 @@ function fillPixels(mousePos) {
 }
 
 function fillPixels2(mousePos, newcolor) {
+    console.log(mousePos);
+    console.log(newcolor);
     var c = document.getElementById("myCanvas");
     var ctx = c.getContext("2d");
     ctx.fillStyle = newcolor;
-    ctx.fillRect(mousePos.x, mousePos.y, 9, 9);
+    var ewX = (mousePos.x * 10) + 1;
+    var ewY = (mousePos.y * 10) + 1;
+    ctx.fillRect(ewX, ewY, 9, 9);
 }
 
 function drawCanvas() {
@@ -172,12 +179,32 @@ function drawCanvas() {
 function init() {
     drawCanvas();
     socket = io();
+    socket.on('pixel', function(msg){
+        fillPixels2({x : msg[0].value, y : msg[1].value}, msg[3].value);
+    });
     socket.on('pixel update', function(msg){
-        console.log('update pixel');
         fillPixels2({x : msg.x, y : msg.y,}, msg.color);
-        console.log(msg);
     });
 
+    socket.on('stats', function(msg){
+        if (row.cells.length == 3){
+        var lastnick = msg[2].value;
+        var lasttime = msg[4].value;
+        console.log('nick: '+ lastnick+' time: '+lasttime);
+        //Cell 4 = Time last Modified
+        var cell4 = row.insertCell(-1);
+        cell4.innerHTML = lasttime;        
+        var cell5 = row.insertCell(-1);
+        cell5.innerHTML = lastnick;
+        //TODO Get time last modified by server
+    
+        //Cell 5 = Last Modified By
+        //TODO get name of who it was last modified by from the server
+        }
+    });
+
+
+    socket.emit('load canvas', '');
 }
 
 $(document).ready( () => {
