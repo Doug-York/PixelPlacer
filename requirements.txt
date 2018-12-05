@@ -6,4 +6,4 @@ Pixel:
   -nickname of who it was changed by
 
 NodeJS:
-  - ExpressJS and Socket.io must be installed on server
+  - ExpressJS, Socket.io, and tedious must be installed on server
