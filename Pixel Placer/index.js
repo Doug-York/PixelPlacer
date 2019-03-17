@@ -1,134 +1,264 @@
-var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-var Connection = require('tedious').Connection;
-var Request = require('tedious').Request;
+"use strict";
+var nickname;
+var table;
+var oldX;
+var oldY;
+var lastTimeModified;
+var newX;
+var newY;
+var currentColor;
+var oldColor = null;
+var submit;
+var row;
+var stats = {};
+var pixelSelected = false;
+var onCooldown = false;
+var cooldownSeconds;
+var database = firebase.database();
+var pixelRef = database.ref('Pixels/');
+var countdownInterval;
+var submitted = false;
 
-var config = {
-    userName : 'dwyork',
-    password : '1p4sw0rd$',
-    server : 'pixlplacer.database.windows.net',
-    options : {
-        encrypt : true,
-        database : 'PixelColors'
+
+// cell3 helper functions
+function componentToHex(c) {
+    var hex = c.toString(16);
+    return hex.length === 1 ? "0" + hex : hex;
+}
+function rgbToHex(r, g, b) {
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
+function revertPixel() {
+    if (oldColor === null){
+        return;
+    }
+    // use oldColor variable to set old rectangle back to what it was
+    var c = document.getElementById("myCanvas");
+    var ctx = c.getContext("2d");
+    ctx.putImageData(oldColor, oldX, oldY);
+    
+    // dont get pixel stats
+}
+
+function sendRequest(newX, newY, currentColor){
+    submitted = true;
+    pixelSelected = false;
+    var time = Date.now();
+    var nick = nickname.val();
+    if (nick === null){
+        nick = "name";
+    }
+    else if (nick.length === 0){
+        nick = "name";
+    }
+    pixelRef.child(newX + "," + newY).update({
+        Color : currentColor,
+        ModBy : nick,
+        ModTime : time
+    });
+    var d = new Date();
+    d.setTime(time)
+    stats["lastModified"].innerHTML = d.toLocaleString();
+    stats["modifiedBy"].innerHTML = nick;
+    startCooldown();
+}
+
+function startCooldown(){
+    cooldownSeconds = 5;
+    stats["cooldown"].textContent = 5;
+    stats["ready"].style.display = "none";
+    stats["timer"].style.display = "block";
+    onCooldown = true;
+    submit.disabled = true;
+    countdownInterval = setInterval(timer, 1000);
+}
+
+function timer(){
+    cooldownSeconds--;
+    if (cooldownSeconds === 0){
+        onCooldown = false;
+        checkButton();
+        stats["timer"].style.display = "none";
+        stats["ready"].style.display = "block";
+        stats["plural"].style.display = "inline"
+        clearInterval(countdownInterval);
+    }
+    else {
+        if (cooldownSeconds === 1){
+            stats["plural"].style.display = "none";
+        }
+        stats["cooldown"].textContent = cooldownSeconds;
     }
 }
 
-//var conn = new Connection(config);
-
-function updatePixel(qry){
-    var conn = new Connection(config);
-    conn.on('connect', function(){
-        var request = new Request(qry, function(err, count, rows){
-        });
-        conn.execSql(request);
-    });
-}
-
-function fetchCanvas(socket){
-    var conn = new Connection(config);
-    conn.on('connect', function(){
-        var request = new Request('SELECT * FROM pixel_stats', function(err,count,rows){
-        });
-        request.on('row', function(columns){
-            socket.emit('pixel', columns);
-        });
-        conn.execSql(request);
-    });
-};
-
-//runs on init to set all pixel colors to white
-function setDatabase(){
-    var conn = new Connection(config);
-    var qry = 'DELETE FROM pixel_stats;';
-    conn.on('connect',function(){
-        var r = new Request(qry, function(err){
-            if (err) console.log(err);
-            console.log('database cleared');
-            var y;
-            for(y=0; y<52; y++){
-              clearGridRow(y);
-            }
-        });
-        conn.execSql(r);
-    });
-};
-
-function getStats(socket, msg){
-    var conn = new Connection(config);
-    var q = 'SELECT * FROM pixel_stats WHERE x = ' + msg.x + ' AND y = '+msg.y; 
-    conn.on('connect', function(){
-        var request = new Request(q, function(err,count,rows){
-            
-        });
-        request.on('row', function(columns){
-            socket.emit('stats', columns);
-        });
-        conn.execSql(request);
-    });
-}
-
-function clearGridRow(y){
-    var x;
-    var qry1 = '';
-    var qry2 = '';
-    for (x=0 ; x<30 ; x++){
-        qry1 = qry1 + 'INSERT INTO pixel_stats VALUES (' + x + ','  + y + ' , \' \' ,' +  '\'#FFFFFF\', \' \');';
+function checkButton(){
+    if (!onCooldown && pixelSelected){
+        submit.disabled = false;
     }
-    for (x=30 ; x<51 ; x++){
-        qry2 = qry2 + 'INSERT INTO pixel_stats VALUES (' + x + ','  + y + ' , \' \' ,' +  '\'#FFFFFF\', \' \');';
+    else {
+        submit.disabled = true;
     }
-    var c1 = new Connection(config);
-    var c2 = new Connection(config);
-    c1.on('connect',function(){
-        var reques = new Request(qry1, function(){
-            console.log('clearing row: ' + y);
-        });
-        c1.execSql(reques);
-    });
-    c2.on('connect',function(){
-        var reques = new Request(qry2, function(){
-            console.log('clearing row: ' + y);
-        });
-        c2.execSql(reques);
-    });
 }
 
-app.get('/', function(req,res){
-    res.sendFile(__dirname + '/frontend' + '/index.html');
-})
+function getPixelStats(x, y, currentColor){
+    
+    newX = (x - 1)/10;
+    newY = (y - 1)/10;
 
-app.get('/index.css', function(req,res){
-    res.sendFile(__dirname + '/frontend' + '/index.css');
-})
+    var cell1 = stats["location"];
+    cell1.innerHTML = newX + "," + newY;
 
-app.get('/index.js', function(req,res){
-    res.sendFile(__dirname + '/frontend' + '/index.js');
-})
+    var cell2 = stats["currentColor"];
+    cell2.innerHTML = currentColor;
 
-io.on('connection', function(socket){
-    socket.on('update pixel', function(msg){
-        console.log('pixel update' + msg.toString());
-        io.emit('pixel update', msg);
-        var q = 'UPDATE pixel_stats SET modified_by =  \'' + msg.nick + '\' ,previous_color =  \'' + msg.color + '\' ,time_modified =\'' + msg.time + '\'';
-        var condition = ' WHERE x = ' + msg.x + ' AND y = ' + msg.y;
-        var qry = q + condition;
-        console.log(qry);
-        updatePixel(qry);
+    var cell3 = stats["previousColor"];
+    let hex = rgbToHex(oldColor.data[0], oldColor.data[1], oldColor.data[2]);
+    cell3.innerHTML = hex;
+    
+    pixelRef.child(newX + "," + newY).once("value", snapshot => {
+        if (snapshot.exists()){
+            var data = snapshot.val();
+            var oldname = data["ModBy"];
+            var time = data["ModTime"];
+            var d = new Date();
+            d.setTime(time);
+            stats["lastModified"].innerHTML = d.toLocaleString();
+            stats["modifiedBy"].innerHTML = oldname;
+        }
+        else {
+            stats["lastModified"].innerHTML = "";
+            stats["modifiedBy"].innerHTML = "";
+        }
+    });
+    
+    checkButton();
+    oldX = x;
+    oldY = y;
+}
+
+function getMousePos(canvas, evt){
+  var rect = canvas.getBoundingClientRect();
+        let posX = evt.clientX - rect.left;
+        let posY = evt.clientY - rect.top;
+        var data = {
+            x: posX - (posX % 10) + 1,
+            y: posY - (posY % 10) + 1
+          };
+        return data;
+}
+
+function fillPixels(mousePos) {
+    var c = document.getElementById("myCanvas");
+    var ctx = c.getContext("2d");
+    var color = document.getElementById("colorselector");
+    if (submitted) {
+        oldColor = ctx.getImageData(mousePos.x, mousePos.y, 9, 9);
+    }
+    else {
+        revertPixel();
+        oldColor = ctx.getImageData(mousePos.x, mousePos.y, 9, 9);
+    }
+    currentColor = color.value;
+    ctx.fillStyle = currentColor;
+    ctx.fillRect(mousePos.x, mousePos.y, 9, 9);
+    getPixelStats(mousePos.x, mousePos.y, currentColor);
+    submitted = false;
+}
+
+function drawCanvas() {
+    var c = document.getElementById("myCanvas");
+    var ctx = c.getContext("2d");
+    c.addEventListener('click', function(evt){
+        pixelSelected = true;
+        var mousePos = getMousePos(c, evt);
+        fillPixels(mousePos);
+        
+    }, false);
+
+    var bw=500;
+    var bh=500;
+    
+    for(var x=0; x<=bw; x+=10){
+        ctx.moveTo(0.5+ x, 0);
+        ctx.lineTo(0.5+ x, bh);
+    }
+    for(var x=0; x<=bh; x+=10){
+        ctx.moveTo(0, 0.5+x);
+        ctx.lineTo(bw, 0.5+x);
+    }
+    ctx.strokeStyle = "black";
+    ctx.stroke();
+    
+}
+
+function init() {
+    drawCanvas();
+    stats["location"] = document.getElementById("location");
+    stats["currentColor"] = document.getElementById("currentColor");
+    stats["previousColor"] = document.getElementById("previousColor");
+    stats["lastModified"] = document.getElementById("lastModified");
+    stats["modifiedBy"] = document.getElementById("modifiedBy");
+    stats["cooldown"] = document.getElementById("cooldown");
+    stats["ready"] = document.getElementById("ready");
+    stats["timer"] = document.getElementById("timer");
+    stats["plural"] = document.getElementById("plural");
+
+    pixelRef.on('child_changed', (snapshot, oldSnap) =>{
+        if (snapshot.exists()){
+            var data = snapshot.key;
+            data = data.split(",");
+            var column = data[0];
+            var row = data[1];
+            var color = snapshot.child('Color/').val();
+
+            var c = document.getElementById("myCanvas");
+            var ctx = c.getContext("2d");
+            ctx.fillStyle = color;
+            var ewX = (column * 10) + 1;
+            var ewY = (row * 10) + 1;
+            ctx.fillRect(ewX, ewY, 9, 9);
+
+        }
     });
 
-    socket.on('load canvas', function(msg){
-        fetchCanvas(socket);   
-    });
+    //colors pixels on page load
+    pixelRef.on('child_added', (snapshot, oldSnap) =>{
+        if (snapshot.exists()){
+            var data = snapshot.key;
+            data = data.split(",");
+            var column = data[0];
+            var row = data[1];
+            var color = snapshot.child('Color/').val();
 
-    socket.on('check stats', function(msg){
-        getStats(socket,msg);
-    });
-})
+            var c = document.getElementById("myCanvas");
+            var ctx = c.getContext("2d");
+            ctx.fillStyle = color;
+            var ewX = (column * 10) + 1;
+            var ewY = (row * 10) + 1;
+            ctx.fillRect(ewX, ewY, 9, 9);
 
-var port = process.env.PORT || 1337;
-http.listen(port, function(){
-    console.log("Server running at http://localhost:%d", port);
+        }
+    });
+    setTimeout(promptName, 500);
+}
+
+function promptName(){
+    var nick = window.prompt("Please enter a nickname to use Pixel Placer", "name");
+    if (nick === null){
+        nick = "name";
+    }
+    else if (nick.length === 0){
+        nick = "name";
+    }
+    nickname.val(nick);
+}
+
+$(document).ready( () => {
+    nickname = $("#nicknameinput");
+    submit = document.getElementById("submitbtn");
+    submit.addEventListener('click',function(evt){
+        sendRequest(newX, newY, currentColor);
+    }, false);
+    init();
 });
-
-setDatabase();
